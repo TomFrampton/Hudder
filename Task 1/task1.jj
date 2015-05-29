@@ -14,7 +14,9 @@ PARSER_END(Hudder)
 
 SKIP : {" "} // Ignore whitespace
 SKIP : {"\n" | "\r" | "\r\n"} // Ignore newlines
-// SKIP : {} Skip comments
+SKIP : {"|=.*=|"} // Ignore comments
+
+TOKEN : {< EMPTY: "">}
 
 // Keywords
 TOKEN : {< FUN: "fun" >}
@@ -31,26 +33,32 @@ TOKEN : {< OR: "or" >}
 TOKEN : {< VAR: "var" >}
 TOKEN : {< OUTPUT: "output" >}
 
-TOKEN : {< IDENTIFIER: (["A"-"Z"]) >}	
+TOKEN : {< IDENTIFIER: ["a"-"z","A"-"Z"](["a"-"z","A"-"Z","0"-"9","_"])* > }	
+TOKEN : {< STRING : "\".*\"" >}
+
+TOKEN : {< NUMBER: (["0"-"9"])+ >}
 
 TOKEN : {< PLUS: "+" >}
 TOKEN : {< MINUS: "-" >}
-TOKEN : {< NUMBER: (["0"-"9"])+ >}
+TOKEN : {< MULT: "*" >}
+TOKEN : {< DIV: "/" >}
+TOKEN : {< ASSIGNMENT: ":=" >}
+TOKEN : {< EQUAL: "==">}
+TOKEN : {< NOT_EQUAL: "!=" >}
+TOKEN : {< GREATER: ">" >}
+TOKEN : {< LESS: "<" >}
+TOKEN : {< GREATER_EQUAL: ">=" >}
+TOKEN : {< LESS_EQUAL: "<=" >}
+TOKEN : {< O_PAR: "(" >}
+TOKEN : {< C_PAR: ")" >}
+TOKEN : {< COMMA: "'">}
+TOKEN : {< SEMI_COLON: ";" >}
 
-/* Note: The Lexer will throw a TokenManagerException if we encounter something that doesn't map to one of
-	our tokens or is skipped for example a minus sign. The Lexer doesn't care about the context though
-	5 ++++ 4 looks fine to the lexer and will produce NUMBER PLUS PLUS PLUS NUMBER. It is up to the lexer
-	to find these errors. Also EOF token is implicit. */
 
 // Parser
 
 void start() :
 {}
 {
-	<NUMBER>
-	(
-		(<PLUS>|<MINUS>)
-		<NUMBER>
-	)*
-	<EOF>
+	// No parser implemented for Task 1
 }
