@@ -1,0 +1,56 @@
+// Lexer
+PARSER_BEGIN(Hudder)
+
+	class Hudder {
+		public static void main(String[] args) throws ParseException, TokenMgrError {
+			Hudder parser = new Hudder(System.in);
+			parser.start();
+		}
+	}
+
+PARSER_END(Hudder)
+
+// Tokens for Lexical Analysis
+
+SKIP : {" "} // Ignore whitespace
+SKIP : {"\n" | "\r" | "\r\n"} // Ignore newlines
+// SKIP : {} Skip comments
+
+// Keywords
+TOKEN : {< FUN: "fun" >}
+TOKEN : {< HANDBACK: "handback" >}
+TOKEN : {< REPEAT: "repeat" >}
+TOKEN : {< UNTIL: "until" >}
+TOKEN : {< WHENEVER: "whenever" >}
+TOKEN : {< DO: "do" >}
+TOKEN : {< OTHERWISE: "otherwise" >}
+TOKEN : {< START: "start" >}
+TOKEN : {< STOP: "stop" >}
+TOKEN : {< AND: "and" >}
+TOKEN : {< OR: "or" >}
+TOKEN : {< VAR: "var" >}
+TOKEN : {< OUTPUT: "output" >}
+
+TOKEN : {< IDENTIFIER: (["A"-"Z"]) >}	
+
+TOKEN : {< PLUS: "+" >}
+TOKEN : {< MINUS: "-" >}
+TOKEN : {< NUMBER: (["0"-"9"])+ >}
+
+/* Note: The Lexer will throw a TokenManagerException if we encounter something that doesn't map to one of
+	our tokens or is skipped for example a minus sign. The Lexer doesn't care about the context though
+	5 ++++ 4 looks fine to the lexer and will produce NUMBER PLUS PLUS PLUS NUMBER. It is up to the lexer
+	to find these errors. Also EOF token is implicit. */
+
+// Parser
+
+void start() :
+{}
+{
+	<NUMBER>
+	(
+		(<PLUS>|<MINUS>)
+		<NUMBER>
+	)*
+	<EOF>
+}
