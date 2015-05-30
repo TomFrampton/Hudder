@@ -1,10 +1,29 @@
+options {
+	MULTI = true;
+	VISITOR = true;
+}
+
 // Lexer
 PARSER_BEGIN(Hudder)
 
+	import java.util.Hashtable;
+	import Model.Function;
+
 	class Hudder {
+
+		public static Hashtable<String, Function> functions = new Hashtable<String, Function>();
+		
 		public static void main(String[] args) throws ParseException, TokenMgrError {
 			Hudder parser = new Hudder(System.in);
-			parser.Hudder();
+			SimpleNode tree = parser.Hudder();
+
+			System.out.println();
+			System.out.println("Program:");
+			HudderDefaultVisitor printVisitor = new HudderDefaultVisitor();
+			tree.jjtAccept(printVisitor, null);
+
+			
+
 		}
 	}
 
@@ -15,8 +34,6 @@ PARSER_END(Hudder)
 SKIP : {" "} // Ignore whitespace
 SKIP : {"\n" | "\r" | "\r\n"} // Ignore newlines
 //SKIP : {"|=.*=|"} // Ignore comments
-
-TOKEN : {< EMPTY: "">}
 
 // Keywords
 TOKEN : {< FUN: "fun" >}
@@ -62,43 +79,49 @@ TOKEN : {< SEMI_COLON: ";" >}
 
 // Parser
 
-void Hudder() :
+SimpleNode Hudder() :
 {}
 {
 	(FunctionDef())* MainProg() <EOF>
+	 {
+    	return jjtThis;
+    }
 }
 
-void MainProg() :
+void MainProg() #void :
 {}
 {
 	ProgBlock()
 }
 
-void FunctionDef() :
-{}
+void FunctionDef()  #Func(2) :
+{ Token id;}
 {
-	<FUN> <IDENTIFIER> <O_PAR> ParamList() <C_PAR> ProgBlock()
+	<FUN> id = <IDENTIFIER> <O_PAR> ParamList() <C_PAR> ProgBlock()
+	{
+		jjtThis.value = id.image;
+	}
 }
 
-void ParamList() :
-{}
+void ParamList()  #ParamList(0) :
+{Token t;}
 {
-	(<IDENTIFIER> (<COMMA> <IDENTIFIER>)* | <EMPTY>)
+	(<IDENTIFIER> (<COMMA> <IDENTIFIER>)* )?
 }
 
-void ProgBlock() :
+void ProgBlock()  #ProgBlock(0) :
 {}
 {
 	<START> Statements() <STOP>
 }
 
-void Statements() :
+void Statements()  #void :
 {}
 {
 	(Statement() <SEMI_COLON>)*
 }
 
-void Statement() :
+void Statement()  #void :
 {}
 {
 	LOOKAHEAD(2) (<VAR>)? <IDENTIFIER> <ASSIGNMENT> Expression()
@@ -110,25 +133,25 @@ void Statement() :
 	| <HANDBACK> Expression()
 }
 
-void Expression() :
+void Expression()  #void :
 {}
 {
 	Term() ((<PLUS> | <MINUS>) Term())*
 }
 
-void Term() :
+void Term()  #void :
 {}
 {
 	Factor() ((<MULT> | <DIV>) Factor())*
 }
 
-void Factor() :
+void Factor()  #void :
 {}
 {
 	<IDENTIFIER> | <NUMBER> | (<PLUS> | <MINUS>)? <O_PAR> Expression() <C_PAR>
 }
 
-void Condition() :
+void Condition()  #void :
 {}
 {
 	<NOT> Condition()
@@ -136,8 +159,8 @@ void Condition() :
 	| <O_PAR> Condition() (<AND> | <OR>) Condition() <C_PAR>
 }
 
-void ParamListCall() :
+void ParamListCall()  #void :
 {}
 {
-	(Expression() (<COMMA> Expression())* | <EMPTY> )
+	(Expression() (<COMMA> Expression())* )?
 }
