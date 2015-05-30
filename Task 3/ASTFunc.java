@@ -15,14 +15,24 @@ public class ASTFunc extends SimpleNode {
 
   /** Accept the visitor. **/
   public Object jjtAccept(HudderVisitor visitor, Object data) {
+    // Get the Parameter list and find out how many children it has
+    ASTParamList paramList = (ASTParamList) this.jjtGetChild(0);
+    int paramCount = paramList.jjtGetNumChildren();
+
     // Has this function been defined?
-    if(Hudder.functions.containsKey(this.value.toString())) {
-      throw new FunctionAlreadyDefinedException(this.value.toString());
-    } else {
+    if(Hudder.functions.containsKey(this.value)) 
+    {
+      Function function = Hudder.functions.get(this.value);
+
+      if(function.paramCount == paramCount) {
+        throw new FunctionAlreadyDefinedException(this.value.toString());
+      }
+    } 
+    else 
+    {
       Function function = new Function();
       function.name = this.value.toString();
-      function.numberOfParameters = 0;
-      System.out.println(function.name + function.numberOfParameters);
+      function.paramCount = paramCount;
 
       Hudder.functions.put(function.name, function);
     }

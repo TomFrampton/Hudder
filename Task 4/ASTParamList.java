@@ -13,9 +13,7 @@ class ASTParamList extends SimpleNode {
 
   /** Accept the visitor. **/
   public Object jjtAccept(HudderVisitor visitor, Object data) {
-
-    return
-    visitor.visit(this, data);
+    return visitor.visit(this, data);
   }
 }
 /* JavaCC - OriginalChecksum=fcd4988214b537cd7c31df5653fe7d12 (do not edit this line) */

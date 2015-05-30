@@ -1,0 +1,19 @@
+|== Should work ==|
+
+fun hello () start
+	var i := 0;
+stop
+
+fun hello (a) start
+	var i := 0;
+stop
+
+|= Should Fail =|
+
+fun qwerty(a,b) start
+	var i := 0;
+stop
+
+fun qwerty(a,b) start
+	var i := 0;
+stop

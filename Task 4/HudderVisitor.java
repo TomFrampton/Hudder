@@ -5,6 +5,13 @@ public interface HudderVisitor
   public Object visit(ASTHudder node, Object data);
   public Object visit(ASTFunc node, Object data);
   public Object visit(ASTParamList node, Object data);
+  public Object visit(ASTParam node, Object data);
   public Object visit(ASTProgBlock node, Object data);
+  public Object visit(ASTStatement node, Object data);
+  public Object visit(ASTExpression node, Object data);
+  public Object visit(ASTTerm node, Object data);
+  public Object visit(ASTFactor node, Object data);
+  public Object visit(ASTCondition node, Object data);
+  public Object visit(ASTParamListCall node, Object data);
 }
-/* JavaCC - OriginalChecksum=99d13e89a8261193a84dd35f8cf845df (do not edit this line) */
+/* JavaCC - OriginalChecksum=4a40f1fd9f72ed04a73d6d8f5345fcc5 (do not edit this line) */

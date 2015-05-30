@@ -9,86 +9,92 @@ public interface HudderConstants {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int FUN = 5;
+  int FUN = 9;
   /** RegularExpression Id. */
-  int HANDBACK = 6;
+  int HANDBACK = 10;
   /** RegularExpression Id. */
-  int REPEAT = 7;
+  int REPEAT = 11;
   /** RegularExpression Id. */
-  int UNTIL = 8;
+  int UNTIL = 12;
   /** RegularExpression Id. */
-  int WHENEVER = 9;
+  int WHENEVER = 13;
   /** RegularExpression Id. */
-  int DO = 10;
+  int DO = 14;
   /** RegularExpression Id. */
-  int OTHERWISE = 11;
+  int OTHERWISE = 15;
   /** RegularExpression Id. */
-  int START = 12;
+  int START = 16;
   /** RegularExpression Id. */
-  int STOP = 13;
+  int STOP = 17;
   /** RegularExpression Id. */
-  int AND = 14;
+  int AND = 18;
   /** RegularExpression Id. */
-  int OR = 15;
+  int OR = 19;
   /** RegularExpression Id. */
-  int VAR = 16;
+  int VAR = 20;
   /** RegularExpression Id. */
-  int OUTPUT = 17;
+  int OUTPUT = 21;
   /** RegularExpression Id. */
-  int IF = 18;
+  int IF = 22;
   /** RegularExpression Id. */
-  int THEN = 19;
+  int THEN = 23;
   /** RegularExpression Id. */
-  int ELSE = 20;
+  int ELSE = 24;
   /** RegularExpression Id. */
-  int NOT = 21;
+  int NOT = 25;
   /** RegularExpression Id. */
-  int IDENTIFIER = 22;
+  int IDENTIFIER = 26;
   /** RegularExpression Id. */
-  int STRING = 23;
+  int STRING = 27;
   /** RegularExpression Id. */
-  int NUMBER = 24;
+  int NUMBER = 28;
   /** RegularExpression Id. */
-  int PLUS = 25;
+  int PLUS = 29;
   /** RegularExpression Id. */
-  int MINUS = 26;
+  int MINUS = 30;
   /** RegularExpression Id. */
-  int MULT = 27;
+  int MULT = 31;
   /** RegularExpression Id. */
-  int DIV = 28;
+  int DIV = 32;
   /** RegularExpression Id. */
-  int ASSIGNMENT = 29;
+  int ASSIGNMENT = 33;
   /** RegularExpression Id. */
-  int EQUAL = 30;
+  int EQUAL = 34;
   /** RegularExpression Id. */
-  int NOT_EQUAL = 31;
+  int NOT_EQUAL = 35;
   /** RegularExpression Id. */
-  int GREATER = 32;
+  int GREATER = 36;
   /** RegularExpression Id. */
-  int LESS = 33;
+  int LESS = 37;
   /** RegularExpression Id. */
-  int GREATER_EQUAL = 34;
+  int GREATER_EQUAL = 38;
   /** RegularExpression Id. */
-  int LESS_EQUAL = 35;
+  int LESS_EQUAL = 39;
   /** RegularExpression Id. */
-  int O_PAR = 36;
+  int O_PAR = 40;
   /** RegularExpression Id. */
-  int C_PAR = 37;
+  int C_PAR = 41;
   /** RegularExpression Id. */
-  int COMMA = 38;
+  int COMMA = 42;
   /** RegularExpression Id. */
-  int SEMI_COLON = 39;
+  int SEMI_COLON = 43;
 
   /** Lexical state. */
   int DEFAULT = 0;
+  /** Lexical state. */
+  int INSIDE_COMMENT = 1;
 
   /** Literal token values. */
   String[] tokenImage = {
     "<EOF>",
     "\" \"",
+    "\"\\t\"",
     "\"\\n\"",
     "\"\\r\"",
     "\"\\r\\n\"",
+    "\"|=\"",
+    "\"=|\"",
+    "<token of kind 8>",
     "\"fun\"",
     "\"handback\"",
     "\"repeat\"",
@@ -122,7 +128,7 @@ public interface HudderConstants {
     "\"<=\"",
     "\"(\"",
     "\")\"",
-    "\"\\\'\"",
+    "\",\"",
     "\";\"",
   };
 

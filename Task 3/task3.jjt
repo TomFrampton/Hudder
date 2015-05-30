@@ -7,23 +7,34 @@ options {
 PARSER_BEGIN(Hudder)
 
 	import java.util.Hashtable;
+
+	import java.io.FileInputStream;
+	import java.io.FileNotFoundException;
+
 	import Model.Function;
 
 	class Hudder {
 
 		public static Hashtable<String, Function> functions = new Hashtable<String, Function>();
 		
-		public static void main(String[] args) throws ParseException, TokenMgrError {
-			Hudder parser = new Hudder(System.in);
+		public static void main(String[] args) throws ParseException, TokenMgrError, FileNotFoundException {
+	
+			Hudder parser = null;
+
+			// If file name supplied use the file, otherwise use System.in
+			if(args.length > 0) {
+				parser = new Hudder(new FileInputStream("./Programs/" + args[0]));
+			} else {
+				parser = new Hudder(System.in);
+			}
+
 			SimpleNode tree = parser.Hudder();
 
 			System.out.println();
 			System.out.println("Program:");
+
 			HudderDefaultVisitor printVisitor = new HudderDefaultVisitor();
 			tree.jjtAccept(printVisitor, null);
-
-			
-
 		}
 	}
 
@@ -32,8 +43,14 @@ PARSER_END(Hudder)
 // Tokens for Lexical Analysis
 
 SKIP : {" "} // Ignore whitespace
+SKIP : {"\t"} // Ignore tabs
 SKIP : {"\n" | "\r" | "\r\n"} // Ignore newlines
-//SKIP : {"|=.*=|"} // Ignore comments
+
+// Ignore multi line comments
+SKIP : { <"|=">: INSIDE_COMMENT }
+
+<INSIDE_COMMENT>
+SKIP: { <"=|">: DEFAULT | <~[]> }
 
 // Keywords
 TOKEN : {< FUN: "fun" >}
@@ -73,7 +90,7 @@ TOKEN : {< GREATER_EQUAL: ">=" >}
 TOKEN : {< LESS_EQUAL: "<=" >}
 TOKEN : {< O_PAR: "(" >}
 TOKEN : {< C_PAR: ")" >}
-TOKEN : {< COMMA: "'">}
+TOKEN : {< COMMA: ",">}
 TOKEN : {< SEMI_COLON: ";" >}
 
 
@@ -95,7 +112,7 @@ void MainProg() #void :
 }
 
 void FunctionDef()  #Func(2) :
-{ Token id;}
+{ Token id; }
 {
 	<FUN> id = <IDENTIFIER> <O_PAR> ParamList() <C_PAR> ProgBlock()
 	{
@@ -103,13 +120,22 @@ void FunctionDef()  #Func(2) :
 	}
 }
 
-void ParamList()  #ParamList(0) :
-{Token t;}
+void ParamList()  #ParamList(> -1) :
+{}
 {
-	(<IDENTIFIER> (<COMMA> <IDENTIFIER>)* )?
+	(Param() (<COMMA> Param() )* )?
 }
 
-void ProgBlock()  #ProgBlock(0) :
+void Param() #Param(0) :
+{Token t;}
+{
+	t = <IDENTIFIER>
+	{
+		jjtThis.value = t.image;
+	}
+}
+
+void ProgBlock()  #ProgBlock(> -1) :
 {}
 {
 	<START> Statements() <STOP>
@@ -121,7 +147,7 @@ void Statements()  #void :
 	(Statement() <SEMI_COLON>)*
 }
 
-void Statement()  #void :
+void Statement()  #Statement(0) :
 {}
 {
 	LOOKAHEAD(2) (<VAR>)? <IDENTIFIER> <ASSIGNMENT> Expression()
@@ -131,27 +157,31 @@ void Statement()  #void :
 	| <IF> Condition() <THEN> Statement() <ELSE> Statement()
 	| <REPEAT> ProgBlock() <UNTIL> <O_PAR> Condition() <C_PAR>
 	| <HANDBACK> Expression()
+	{
+		jjtThis.value = "Statement";
+	}
 }
 
-void Expression()  #void :
-{}
+void Expression()  #Expression(2) :
+{Token t;}
 {
-	Term() ((<PLUS> | <MINUS>) Term())*
+	Term() ((t = <PLUS> { jjtThis.value = t.image; } | t = <MINUS> { jjtThis.value = t.image; }) Term())*
 }
 
-void Term()  #void :
-{}
+
+void Term()  #Term(0) :
+{Token t;}
 {
-	Factor() ((<MULT> | <DIV>) Factor())*
+	Factor() ((t = <MULT> { jjtThis.value = t.image; } | t = <DIV> { jjtThis.value = t.image; }) Factor())*
 }
 
-void Factor()  #void :
+void Factor()  #Factor(0) :
 {}
 {
 	<IDENTIFIER> | <NUMBER> | (<PLUS> | <MINUS>)? <O_PAR> Expression() <C_PAR>
 }
 
-void Condition()  #void :
+void Condition()  #Condition(0) :
 {}
 {
 	<NOT> Condition()
@@ -159,7 +189,7 @@ void Condition()  #void :
 	| <O_PAR> Condition() (<AND> | <OR>) Condition() <C_PAR>
 }
 
-void ParamListCall()  #void :
+void ParamListCall()  #ParamListCall(0) :
 {}
 {
 	(Expression() (<COMMA> Expression())* )?

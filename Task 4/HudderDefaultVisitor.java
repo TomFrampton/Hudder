@@ -16,8 +16,29 @@ public class HudderDefaultVisitor implements HudderVisitor{
   public Object visit(ASTParamList node, Object data){
     return defaultVisit(node, data);
   }
+  public Object visit(ASTParam node, Object data){
+    return defaultVisit(node, data);
+  }
   public Object visit(ASTProgBlock node, Object data){
     return defaultVisit(node, data);
   }
+  public Object visit(ASTStatement node, Object data){
+    return defaultVisit(node, data);
+  }
+  public Object visit(ASTExpression node, Object data){
+    return defaultVisit(node, data);
+  }
+  public Object visit(ASTTerm node, Object data){
+    return defaultVisit(node, data);
+  }
+  public Object visit(ASTFactor node, Object data){
+    return defaultVisit(node, data);
+  }
+  public Object visit(ASTCondition node, Object data){
+    return defaultVisit(node, data);
+  }
+  public Object visit(ASTParamListCall node, Object data){
+    return defaultVisit(node, data);
+  }
 }
-/* JavaCC - OriginalChecksum=95c1a8fbf11305889eba163d407fbd13 (do not edit this line) */
+/* JavaCC - OriginalChecksum=36d0a0975eeb29ef0c637b4665656c9f (do not edit this line) */

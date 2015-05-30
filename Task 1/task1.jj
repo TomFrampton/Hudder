@@ -1,10 +1,21 @@
 // Lexer
 PARSER_BEGIN(Hudder)
 
+	import java.io.FileInputStream;
+	import java.io.FileNotFoundException;
+
 	class Hudder {
-		public static void main(String[] args) throws ParseException, TokenMgrError {
-			Hudder parser = new Hudder(System.in);
-			parser.start();
+		public static void main(String[] args) throws ParseException, TokenMgrError, FileNotFoundException {
+			Hudder parser = null;
+
+			// If file name supplied use the file, otherwise use System.in
+			if(args.length > 0) {
+				parser = new Hudder(new FileInputStream("./Programs/" + args[0]));
+			} else {
+				parser = new Hudder(System.in);
+			}
+
+			parser.Hudder();
 		}
 	}
 
@@ -14,9 +25,12 @@ PARSER_END(Hudder)
 
 SKIP : {" "} // Ignore whitespace
 SKIP : {"\n" | "\r" | "\r\n"} // Ignore newlines
-SKIP : {"|=.*=|"} // Ignore comments
 
-TOKEN : {< EMPTY: "">}
+// Ignore multi line comments
+SKIP : { <"|=">: INSIDE_COMMENT }
+
+<INSIDE_COMMENT>
+SKIP: { <"=|">: DEFAULT | <~[]> }
 
 // Keywords
 TOKEN : {< FUN: "fun" >}
@@ -51,14 +65,15 @@ TOKEN : {< GREATER_EQUAL: ">=" >}
 TOKEN : {< LESS_EQUAL: "<=" >}
 TOKEN : {< O_PAR: "(" >}
 TOKEN : {< C_PAR: ")" >}
-TOKEN : {< COMMA: "'">}
+TOKEN : {< COMMA: ",">}
 TOKEN : {< SEMI_COLON: ";" >}
 
 
 // Parser
 
-void start() :
+void Hudder() :
 {}
 {
-	// No parser implemented for Task 1
+	// Etc - will not complete for all as this is tested in later tasks
+	(<FUN> | <HANDBACK> | <REPEAT> | <UNTIL> | <WHENEVER> | <DO> | <OTHERWISE> | <START> | <STOP> | <AND> | <OR> | <VAR> | <OUTPUT> | <IDENTIFIER>)*<EOF>
 }

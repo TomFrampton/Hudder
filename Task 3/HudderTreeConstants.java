@@ -5,7 +5,14 @@ public interface HudderTreeConstants
   public int JJTVOID = 1;
   public int JJTFUNC = 2;
   public int JJTPARAMLIST = 3;
-  public int JJTPROGBLOCK = 4;
+  public int JJTPARAM = 4;
+  public int JJTPROGBLOCK = 5;
+  public int JJTSTATEMENT = 6;
+  public int JJTEXPRESSION = 7;
+  public int JJTTERM = 8;
+  public int JJTFACTOR = 9;
+  public int JJTCONDITION = 10;
+  public int JJTPARAMLISTCALL = 11;
 
 
   public String[] jjtNodeName = {
@@ -13,7 +20,14 @@ public interface HudderTreeConstants
     "void",
     "Func",
     "ParamList",
+    "Param",
     "ProgBlock",
+    "Statement",
+    "Expression",
+    "Term",
+    "Factor",
+    "Condition",
+    "ParamListCall",
   };
 }
-/* JavaCC - OriginalChecksum=8b22154dad6a5a5b6c898d2d1279db1f (do not edit this line) */
+/* JavaCC - OriginalChecksum=5350c72bb98bc904c5c7f47c8be2694f (do not edit this line) */

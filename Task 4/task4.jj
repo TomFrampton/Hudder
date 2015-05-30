@@ -7,16 +7,36 @@
 // Lexer
 PARSER_BEGIN(Hudder)
 
+	import java.util.Hashtable;
+
+	import java.io.FileInputStream;
+	import java.io.FileNotFoundException;
+
+	import Model.Function;
+
 	class Hudder/*@bgen(jjtree)*/implements HudderTreeConstants/*@egen*/ {/*@bgen(jjtree)*/
   protected static JJTHudderState jjtree = new JJTHudderState();
 
 /*@egen*/
-		public static void main(String[] args) throws ParseException, TokenMgrError {
-			Hudder parser = new Hudder(System.in);
+
+		public static Hashtable<String, Function> functions = new Hashtable<String, Function>();
+		
+		public static void main(String[] args) throws ParseException, TokenMgrError, FileNotFoundException {
+	
+			Hudder parser = null;
+
+			// If file name supplied use the file, otherwise use System.in
+			if(args.length > 0) {
+				parser = new Hudder(new FileInputStream("./Programs/" + args[0]));
+			} else {
+				parser = new Hudder(System.in);
+			}
+
 			SimpleNode tree = parser.Hudder();
 
 			System.out.println();
 			System.out.println("Program:");
+
 			HudderDefaultVisitor printVisitor = new HudderDefaultVisitor();
 			tree.jjtAccept(printVisitor, null);
 
@@ -30,8 +50,14 @@ PARSER_END(Hudder)
 // Tokens for Lexical Analysis
 
 SKIP : {" "} // Ignore whitespace
+SKIP : {"\t"} // Ignore tabs
 SKIP : {"\n" | "\r" | "\r\n"} // Ignore newlines
-//SKIP : {"|=.*=|"} // Ignore comments
+
+// Ignore multi line comments
+SKIP : { <"|=">: INSIDE_COMMENT }
+
+<INSIDE_COMMENT>
+SKIP: { <"=|">: DEFAULT | <~[]> }
 
 // Keywords
 TOKEN : {< FUN: "fun" >}
@@ -71,7 +97,7 @@ TOKEN : {< GREATER_EQUAL: ">=" >}
 TOKEN : {< LESS_EQUAL: "<=" >}
 TOKEN : {< O_PAR: "(" >}
 TOKEN : {< C_PAR: ")" >}
-TOKEN : {< COMMA: "'">}
+TOKEN : {< COMMA: ",">}
 TOKEN : {< SEMI_COLON: ";" >}
 
 
@@ -128,7 +154,7 @@ void FunctionDef()           :
   ASTFunc jjtn000 = new ASTFunc(JJTFUNC);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
-/*@egen*/ Token id;}
+/*@egen*/ Token id; }
 {/*@bgen(jjtree) #Func( 2) */
         try {
 /*@egen*/
@@ -163,16 +189,56 @@ void FunctionDef()           :
 /*@egen*/
 }
 
-void ParamList()                :
-{/*@bgen(jjtree) #ParamList( 0) */
- ASTParamList jjtn000 = new ASTParamList(JJTPARAMLIST);
+void ParamList()                   :
+{/*@bgen(jjtree) #ParamList(> - 1) */
+  ASTParamList jjtn000 = new ASTParamList(JJTPARAMLIST);
+  boolean jjtc000 = true;
+  jjtree.openNodeScope(jjtn000);
+/*@egen*/}
+{/*@bgen(jjtree) #ParamList(> - 1) */
+        try {
+/*@egen*/
+	(Param() (<COMMA> Param() )* )?/*@bgen(jjtree)*/
+        } catch (Throwable jjte000) {
+          if (jjtc000) {
+            jjtree.clearNodeScope(jjtn000);
+            jjtc000 = false;
+          } else {
+            jjtree.popNode();
+          }
+          if (jjte000 instanceof RuntimeException) {
+            throw (RuntimeException)jjte000;
+          }
+          if (jjte000 instanceof ParseException) {
+            throw (ParseException)jjte000;
+          }
+          throw (Error)jjte000;
+        } finally {
+          if (jjtc000) {
+            jjtree.closeNodeScope(jjtn000, jjtree.nodeArity() > - 1);
+          }
+        }
+/*@egen*/
+}
+
+void Param()           :
+{/*@bgen(jjtree) #Param( 0) */
+ ASTParam jjtn000 = new ASTParam(JJTPARAM);
  boolean jjtc000 = true;
  jjtree.openNodeScope(jjtn000);
 /*@egen*/Token t;}
-{/*@bgen(jjtree) #ParamList( 0) */
+{/*@bgen(jjtree) #Param( 0) */
         try {
 /*@egen*/
-	(<IDENTIFIER> (<COMMA> <IDENTIFIER>)* )?/*@bgen(jjtree)*/
+	t = <IDENTIFIER>/*@bgen(jjtree)*/
+        {
+          jjtree.closeNodeScope(jjtn000,  0);
+          jjtc000 = false;
+        }
+/*@egen*/
+	{
+		jjtn000.value = t.image;
+	}/*@bgen(jjtree)*/
         } finally {
           if (jjtc000) {
             jjtree.closeNodeScope(jjtn000,  0);
@@ -181,16 +247,68 @@ void ParamList()                :
 /*@egen*/
 }
 
-void ProgBlock()                :
-{/*@bgen(jjtree) #ProgBlock( 0) */
+void ProgBlock()                   :
+{/*@bgen(jjtree) #ProgBlock(> - 1) */
   ASTProgBlock jjtn000 = new ASTProgBlock(JJTPROGBLOCK);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
 /*@egen*/}
-{/*@bgen(jjtree) #ProgBlock( 0) */
+{/*@bgen(jjtree) #ProgBlock(> - 1) */
         try {
 /*@egen*/
 	<START> Statements() <STOP>/*@bgen(jjtree)*/
+        } catch (Throwable jjte000) {
+          if (jjtc000) {
+            jjtree.clearNodeScope(jjtn000);
+            jjtc000 = false;
+          } else {
+            jjtree.popNode();
+          }
+          if (jjte000 instanceof RuntimeException) {
+            throw (RuntimeException)jjte000;
+          }
+          if (jjte000 instanceof ParseException) {
+            throw (ParseException)jjte000;
+          }
+          throw (Error)jjte000;
+        } finally {
+          if (jjtc000) {
+            jjtree.closeNodeScope(jjtn000, jjtree.nodeArity() > - 1);
+          }
+        }
+/*@egen*/
+}
+
+void Statements()        :
+{}
+{
+	(Statement() <SEMI_COLON>)*
+}
+
+void Statement()                :
+{/*@bgen(jjtree) #Statement( 0) */
+  ASTStatement jjtn000 = new ASTStatement(JJTSTATEMENT);
+  boolean jjtc000 = true;
+  jjtree.openNodeScope(jjtn000);
+/*@egen*/}
+{/*@bgen(jjtree) #Statement( 0) */
+        try {
+/*@egen*/
+	LOOKAHEAD(2) (<VAR>)? <IDENTIFIER> <ASSIGNMENT> Expression()
+	| <IDENTIFIER> <O_PAR> ParamListCall() <C_PAR>
+	| <OUTPUT> (Expression() | <STRING>)
+	| <WHENEVER> Condition() <DO> Statements() (<OTHERWISE> Statements())? <STOP>
+	| <IF> Condition() <THEN> Statement() <ELSE> Statement()
+	| <REPEAT> ProgBlock() <UNTIL> <O_PAR> Condition() <C_PAR>
+	| <HANDBACK> Expression()/*@bgen(jjtree)*/
+        {
+          jjtree.closeNodeScope(jjtn000,  0);
+          jjtc000 = false;
+        }
+/*@egen*/
+	{
+		jjtn000.value = "Statement";
+	}/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -213,52 +331,165 @@ void ProgBlock()                :
 /*@egen*/
 }
 
-void Statements()        :
-{}
-{
-	(Statement() <SEMI_COLON>)*
+void Expression()                 :
+{/*@bgen(jjtree) #Expression( 2) */
+ ASTExpression jjtn000 = new ASTExpression(JJTEXPRESSION);
+ boolean jjtc000 = true;
+ jjtree.openNodeScope(jjtn000);
+/*@egen*/Token t;}
+{/*@bgen(jjtree) #Expression( 2) */
+        try {
+/*@egen*/
+	Term() ((t = <PLUS> { jjtn000.value = t.image; } | t = <MINUS> { jjtn000.value = t.image; }) Term())*/*@bgen(jjtree)*/
+        } catch (Throwable jjte000) {
+          if (jjtc000) {
+            jjtree.clearNodeScope(jjtn000);
+            jjtc000 = false;
+          } else {
+            jjtree.popNode();
+          }
+          if (jjte000 instanceof RuntimeException) {
+            throw (RuntimeException)jjte000;
+          }
+          if (jjte000 instanceof ParseException) {
+            throw (ParseException)jjte000;
+          }
+          throw (Error)jjte000;
+        } finally {
+          if (jjtc000) {
+            jjtree.closeNodeScope(jjtn000,  2);
+          }
+        }
+/*@egen*/
 }
 
-void Statement()        :
-{}
-{
-	LOOKAHEAD(2) (<VAR>)? <IDENTIFIER> <ASSIGNMENT> Expression()
-	| <IDENTIFIER> <O_PAR> ParamListCall() <C_PAR>
-	| <OUTPUT> (Expression() | <STRING>)
-	| <WHENEVER> Condition() <DO> Statements() (<OTHERWISE> Statements())? <STOP>
-	| <IF> Condition() <THEN> Statement() <ELSE> Statement()
-	| <REPEAT> ProgBlock() <UNTIL> <O_PAR> Condition() <C_PAR>
-	| <HANDBACK> Expression()
+
+void Term()           :
+{/*@bgen(jjtree) #Term( 0) */
+ ASTTerm jjtn000 = new ASTTerm(JJTTERM);
+ boolean jjtc000 = true;
+ jjtree.openNodeScope(jjtn000);
+/*@egen*/Token t;}
+{/*@bgen(jjtree) #Term( 0) */
+        try {
+/*@egen*/
+	Factor() ((t = <MULT> { jjtn000.value = t.image; } | t = <DIV> { jjtn000.value = t.image; }) Factor())*/*@bgen(jjtree)*/
+        } catch (Throwable jjte000) {
+          if (jjtc000) {
+            jjtree.clearNodeScope(jjtn000);
+            jjtc000 = false;
+          } else {
+            jjtree.popNode();
+          }
+          if (jjte000 instanceof RuntimeException) {
+            throw (RuntimeException)jjte000;
+          }
+          if (jjte000 instanceof ParseException) {
+            throw (ParseException)jjte000;
+          }
+          throw (Error)jjte000;
+        } finally {
+          if (jjtc000) {
+            jjtree.closeNodeScope(jjtn000,  0);
+          }
+        }
+/*@egen*/
 }
 
-void Expression()        :
-{}
-{
-	Term() ((<PLUS> | <MINUS>) Term())*
+void Factor()             :
+{/*@bgen(jjtree) #Factor( 0) */
+  ASTFactor jjtn000 = new ASTFactor(JJTFACTOR);
+  boolean jjtc000 = true;
+  jjtree.openNodeScope(jjtn000);
+/*@egen*/}
+{/*@bgen(jjtree) #Factor( 0) */
+        try {
+/*@egen*/
+	<IDENTIFIER> | <NUMBER> | (<PLUS> | <MINUS>)? <O_PAR> Expression() <C_PAR>/*@bgen(jjtree)*/
+        } catch (Throwable jjte000) {
+          if (jjtc000) {
+            jjtree.clearNodeScope(jjtn000);
+            jjtc000 = false;
+          } else {
+            jjtree.popNode();
+          }
+          if (jjte000 instanceof RuntimeException) {
+            throw (RuntimeException)jjte000;
+          }
+          if (jjte000 instanceof ParseException) {
+            throw (ParseException)jjte000;
+          }
+          throw (Error)jjte000;
+        } finally {
+          if (jjtc000) {
+            jjtree.closeNodeScope(jjtn000,  0);
+          }
+        }
+/*@egen*/
 }
 
-void Term()        :
-{}
-{
-	Factor() ((<MULT> | <DIV>) Factor())*
-}
-
-void Factor()        :
-{}
-{
-	<IDENTIFIER> | <NUMBER> | (<PLUS> | <MINUS>)? <O_PAR> Expression() <C_PAR>
-}
-
-void Condition()        :
-{}
-{
+void Condition()                :
+{/*@bgen(jjtree) #Condition( 0) */
+  ASTCondition jjtn000 = new ASTCondition(JJTCONDITION);
+  boolean jjtc000 = true;
+  jjtree.openNodeScope(jjtn000);
+/*@egen*/}
+{/*@bgen(jjtree) #Condition( 0) */
+        try {
+/*@egen*/
 	<NOT> Condition()
 	| LOOKAHEAD(2) Expression() (<EQUAL> | <NOT_EQUAL> | <GREATER> | <LESS> | <GREATER_EQUAL> | <LESS_EQUAL>) Expression()
-	| <O_PAR> Condition() (<AND> | <OR>) Condition() <C_PAR>
+	| <O_PAR> Condition() (<AND> | <OR>) Condition() <C_PAR>/*@bgen(jjtree)*/
+        } catch (Throwable jjte000) {
+          if (jjtc000) {
+            jjtree.clearNodeScope(jjtn000);
+            jjtc000 = false;
+          } else {
+            jjtree.popNode();
+          }
+          if (jjte000 instanceof RuntimeException) {
+            throw (RuntimeException)jjte000;
+          }
+          if (jjte000 instanceof ParseException) {
+            throw (ParseException)jjte000;
+          }
+          throw (Error)jjte000;
+        } finally {
+          if (jjtc000) {
+            jjtree.closeNodeScope(jjtn000,  0);
+          }
+        }
+/*@egen*/
 }
 
-void ParamListCall()        :
-{}
-{
-	(Expression() (<COMMA> Expression())* )?
+void ParamListCall()                    :
+{/*@bgen(jjtree) #ParamListCall( 0) */
+  ASTParamListCall jjtn000 = new ASTParamListCall(JJTPARAMLISTCALL);
+  boolean jjtc000 = true;
+  jjtree.openNodeScope(jjtn000);
+/*@egen*/}
+{/*@bgen(jjtree) #ParamListCall( 0) */
+        try {
+/*@egen*/
+	(Expression() (<COMMA> Expression())* )?/*@bgen(jjtree)*/
+        } catch (Throwable jjte000) {
+          if (jjtc000) {
+            jjtree.clearNodeScope(jjtn000);
+            jjtc000 = false;
+          } else {
+            jjtree.popNode();
+          }
+          if (jjte000 instanceof RuntimeException) {
+            throw (RuntimeException)jjte000;
+          }
+          if (jjte000 instanceof ParseException) {
+            throw (ParseException)jjte000;
+          }
+          throw (Error)jjte000;
+        } finally {
+          if (jjtc000) {
+            jjtree.closeNodeScope(jjtn000,  0);
+          }
+        }
+/*@egen*/
 }
